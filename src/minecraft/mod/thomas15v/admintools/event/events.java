@@ -15,7 +15,8 @@ public class events {
 	@ForgeSubscribe
 	public void PlayerJoinedTheGame(EntityJoinWorldEvent e){
 		if (e.entity instanceof EntityPlayer) {
-			notifications.ShowNotification(((EntityPlayer) e.entity));
+			EntityPlayer p =(EntityPlayer) e.entity;
+			notifications.ShowNotification(p.username);
 		}
 		
 	}

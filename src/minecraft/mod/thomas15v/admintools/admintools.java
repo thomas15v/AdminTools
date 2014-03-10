@@ -1,5 +1,7 @@
 package mod.thomas15v.admintools;
 
+import java.util.logging.Logger;
+
 import mod.thomas15v.admintools.hud.Notifications;
 import mod.thomas15v.admintools.listener.ChatListener;
 import cpw.mods.fml.common.Mod;
@@ -24,4 +26,9 @@ public class admintools {
 		NetworkRegistry.instance().registerChatListener(new ChatListener(notifications));
 		
 	}	
+	
+	public static Logger getModLogger(final String name) {
+		  final Logger result = Logger.getLogger(name);
+		  return result;
+	}
 }
