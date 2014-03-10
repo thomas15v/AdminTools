@@ -18,6 +18,5 @@ public class events {
 			EntityPlayer p =(EntityPlayer) e.entity;
 			notifications.ShowNotification(p.username);
 		}
-		
 	}
 }

@@ -18,15 +18,14 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class admintools {
 	@Instance(value = "admintools")
 	public static admintools instance;
-	
+
 	@Init
 	public void init(FMLInitializationEvent e){
 		Notifications notifications = new Notifications();
 		TickRegistry.registerTickHandler(notifications, Side.CLIENT);
 		NetworkRegistry.instance().registerChatListener(new ChatListener(notifications));
-		
-	}	
-	
+	}
+
 	public static Logger getModLogger(final String name) {
 		  final Logger result = Logger.getLogger(name);
 		  return result;
