@@ -8,10 +8,13 @@ import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.client.IItemRenderer.ItemRenderType;
+import net.minecraftforge.client.MinecraftForgeClient;
 
 import org.lwjgl.opengl.GL11;
 
@@ -24,7 +27,7 @@ public class SpecialTileEntitySignRenderer extends TileEntitySpecialRenderer {
 	public SpecialTileEntitySignRenderer(){
 		itemrender = new RenderItem();
 		itemrender.setRenderManager(RenderManager.instance);
-		test = new ItemStack(Block.enchantmentTable);
+		test = new ItemStack(Block.cobblestone, 10);
 		
 	}
 	
@@ -104,15 +107,9 @@ public class SpecialTileEntitySignRenderer extends TileEntitySpecialRenderer {
             }
         }
         
-        Minecraft mc = Minecraft.getMinecraft();
-        itemrender.renderItemAndEffectIntoGUI(mc.fontRenderer, mc.renderEngine, test, 0, 0);
-        
-        //itemrender.renderItemIntoGUI(mc.fontRenderer, mc.renderEngine, test, 0, 0);
-        
-        
+               
+        MakeShopSign("Thomas15v","$10000", "buy" , test );
        
-        //end code
-
         GL11.glDepthMask(true);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         GL11.glPopMatrix();
@@ -121,6 +118,31 @@ public class SpecialTileEntitySignRenderer extends TileEntitySpecialRenderer {
     public void renderTileEntityAt(TileEntity par1TileEntity, double par2, double par4, double par6, float par8)
     {
         this.renderTileEntitySignAt((TileEntitySign)par1TileEntity, par2, par4, par6, par8);
+    }
+    
+    
+    private void handleRenderItem(ItemStack is)
+    {
+    	//Credits to neptunepink creator of factorization, this code is used in the barrel of his mod.
+    	
+    	Minecraft mc = Minecraft.getMinecraft();
+    	GL11.glPushMatrix();
+    	GL11.glTranslatef(-40F,-10F,0F);
+    	GL11.glScalef(1.5F, 1.5F, 0.01F);
+    	//if (!ForgeHooksClient.renderInventoryItem(new RenderBlocks(), mc.renderEngine, is, true, 0.0F, 0.0F, 0.0F))
+    		itemrender.renderItemAndEffectIntoGUI(mc.fontRenderer, mc.renderEngine, is, 0, 0);
+    	GL11.glPopMatrix();
+    }
+    
+    private void MakeShopSign(String Username, String Price, String What , ItemStack item){
+    	FontRenderer fontRenderer = this.getFontRenderer();
+    	
+    	handleRenderItem(item);
+        fontRenderer.drawString(Username, -fontRenderer.getStringWidth(Username) / 2,-20, 0x0000000);
+        //fontRenderer.drawString("123456789123456", 44,-20, 0x0000000);
+        fontRenderer.drawString(Price, -10, 0, 0x0000000);
+        fontRenderer.drawString(What, -10, 10, 0x0000000);
+        fontRenderer.drawString(item.stackSize + "", -20, 8, 0xFFFFFF,true);
     }
 }
 
