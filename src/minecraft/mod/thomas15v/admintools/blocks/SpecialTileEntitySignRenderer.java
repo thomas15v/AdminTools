@@ -1,37 +1,23 @@
 package mod.thomas15v.admintools.blocks;
 
+import java.util.regex.Pattern;
+
+import mod.thomas15v.admintools.ShopSign;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.model.ModelSign;
-import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySign;
-import net.minecraftforge.client.ForgeHooksClient;
-import net.minecraftforge.client.IItemRenderer.ItemRenderType;
-import net.minecraftforge.client.MinecraftForgeClient;
 
 import org.lwjgl.opengl.GL11;
 
 public class SpecialTileEntitySignRenderer extends TileEntitySpecialRenderer {
-
-	//Begin New code
-	private RenderItem itemrender;
-	private ItemStack test;
-		
-	public SpecialTileEntitySignRenderer(){
-		itemrender = new RenderItem();
-		itemrender.setRenderManager(RenderManager.instance);
-		test = new ItemStack(Block.cobblestone, 10);
-		
-	}
-	
-	//end new code
 	
 	//begin minecraft code
 	private ModelSign modelSign = new ModelSign();
@@ -91,24 +77,31 @@ public class SpecialTileEntitySignRenderer extends TileEntitySpecialRenderer {
         
         //end minecraft code
         //begin code
-        
-        for (int i = 0; i < TileEntity.signText.length; ++i)
-        {
-            String currentstring = TileEntity.signText[i];
-            
-            if (i == TileEntity.lineBeingEdited)
-            {
-            	currentstring = "> " + currentstring + " <";
-                fontRenderer.drawString(currentstring, -fontRenderer.getStringWidth(currentstring) / 2, i * 10 - TileEntity.signText.length * 5, var13);
-            }
-            else
-            {
-            	fontRenderer.drawString(currentstring, -fontRenderer.getStringWidth(currentstring) / 2, i * 10 - TileEntity.signText.length * 5, var13);
-            }
+        if (TileEntity.isEditable() && IsShopSign(TileEntity.signText)){
+        	//Minecraft.getMinecraft().renderEngine.log.severe();
+        	ShopSign shopsign = new ShopSign(TileEntity);
+        	shopsign.render();
+        }
+        else{
+	        for (int i = 0; i < TileEntity.signText.length; ++i)
+	        {
+	            String currentstring = TileEntity.signText[i];
+	            
+	            if (i == TileEntity.lineBeingEdited)
+	            {
+	            	currentstring = "> " + currentstring + " <";
+	                fontRenderer.drawString(currentstring, -fontRenderer.getStringWidth(currentstring) / 2, i * 10 - TileEntity.signText.length * 5, var13);
+	            }
+	            else
+	            {
+	            	fontRenderer.drawString(currentstring, -fontRenderer.getStringWidth(currentstring) / 2, i * 10 - TileEntity.signText.length * 5, var13);
+	            }
+	        }
         }
         
+        
                
-        MakeShopSign("Thomas15v","$10000", "buy" , test );
+        //MakeShopSign("Thomas15v","$10000", "buy" , test );
        
         GL11.glDepthMask(true);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -121,28 +114,27 @@ public class SpecialTileEntitySignRenderer extends TileEntitySpecialRenderer {
     }
     
     
-    private void handleRenderItem(ItemStack is)
-    {
-    	//Credits to neptunepink creator of factorization, this code is used in the barrel of his mod.
-    	
-    	Minecraft mc = Minecraft.getMinecraft();
-    	GL11.glPushMatrix();
-    	GL11.glTranslatef(-40F,-10F,0F);
-    	GL11.glScalef(1.5F, 1.5F, 0.01F);
-    	//if (!ForgeHooksClient.renderInventoryItem(new RenderBlocks(), mc.renderEngine, is, true, 0.0F, 0.0F, 0.0F))
-    		itemrender.renderItemAndEffectIntoGUI(mc.fontRenderer, mc.renderEngine, is, 0, 0);
-    	GL11.glPopMatrix();
-    }
+    //Code from the original ChestShop plugin
     
-    private void MakeShopSign(String Username, String Price, String What , ItemStack item){
-    	FontRenderer fontRenderer = this.getFontRenderer();
-    	
-    	handleRenderItem(item);
-        fontRenderer.drawString(Username, -fontRenderer.getStringWidth(Username) / 2,-20, 0x0000000);
-        //fontRenderer.drawString("123456789123456", 44,-20, 0x0000000);
-        fontRenderer.drawString(Price, -10, 0, 0x0000000);
-        fontRenderer.drawString(What, -10, 10, 0x0000000);
-        fontRenderer.drawString(item.stackSize + "", -20, 8, 0xFFFFFF,true);
+    public static final Pattern[] SHOP_SIGN_PATTERN = {
+        Pattern.compile("^?[\\w -.]*$"),
+        Pattern.compile("^[1-9][0-9]*$"),
+        Pattern.compile("(?i)^[\\d.bs(free) :]+$"),
+        Pattern.compile("^[\\w #:-]+$")
+    }; 
+    
+    final byte NAME_LINE = 0;
+    final byte QUANTITY_LINE = 1;
+    final byte PRICE_LINE = 2;
+    final byte ITEM_LINE = 3;
+       
+    private boolean IsShopSign(String[] text){
+    	for (int i = 0; i < 4; i++) {
+            if (!SHOP_SIGN_PATTERN[i].matcher(text[i]).matches()) {
+                return false;
+            }
+        }
+    	return text[PRICE_LINE].indexOf(':') == text[PRICE_LINE].lastIndexOf(':') && ShopSign.GetStackFromName(text[3]) != null;
     }
 }
 

@@ -13,10 +13,14 @@ import cpw.mods.fml.common.network.Player;
 
 public class ConnectionHandler implements IPacketHandler {
 
+	public enum PacketType{
+		ShopSignInfo
+	}
+	
 	@Override
 	public void onPacketData(INetworkManager manager, Packet250CustomPayload packet, Player player) {
 		if (packet.channel.equalsIgnoreCase("AdminTools")){
-			admintools.notifications.ShowNotification("LOL WE RECIEVED SOMETHING :o");
+			admintools.notifications.ShowNotification(packet.data.toString());
 		}
 		// TODO Auto-generated method stub
 		
