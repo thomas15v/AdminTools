@@ -100,8 +100,6 @@ public class SpecialTileEntitySignRenderer extends TileEntitySpecialRenderer
                 }
             }
         }
-
-        //MakeShopSign("Thomas15v","$10000", "buy" , test );
         GL11.glDepthMask(true);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         GL11.glPopMatrix();
@@ -122,10 +120,10 @@ public class SpecialTileEntitySignRenderer extends TileEntitySpecialRenderer
         Pattern.compile("^[\\w #:-]+$")
     };
 
-    final byte NAME_LINE = 0;
-    final byte QUANTITY_LINE = 1;
-    final byte PRICE_LINE = 2;
-    final byte ITEM_LINE = 3;
+    static final byte NAME_LINE = 0;
+    static final byte QUANTITY_LINE = 1;
+    static final byte PRICE_LINE = 2;
+    static final byte ITEM_LINE = 3;
 
     private boolean IsShopSign(String[] text)
     {
@@ -136,7 +134,6 @@ public class SpecialTileEntitySignRenderer extends TileEntitySpecialRenderer
                 return false;
             }
         }
-
         return text[PRICE_LINE].indexOf(':') == text[PRICE_LINE].lastIndexOf(':') && ShopSign.GetStackFromName(text[3]) != null;
     }
 }

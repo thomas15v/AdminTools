@@ -25,11 +25,8 @@ import net.minecraftforge.client.ForgeHooksClient;
 
 public class ShopSign
 {
-    static public Map<String, Item> NameList = new HashMap<String, Item>();
-
     String username;
-    int buyPrice;
-    int sellPrice;
+    String[] Price = new String[2];
     ItemStack item;
 
     double NO_PRICE = -1;
@@ -46,14 +43,6 @@ public class ShopSign
 
     TileEntitySign sign;
 
-    private ShopSign(String username, int buyPrice, int sellPrice, ItemStack item)
-    {
-        this.username = username;
-        this.buyPrice = buyPrice;
-        this.sellPrice = sellPrice;
-        this.item = item;
-    }
-
     public ShopSign(TileEntitySign sign)
     {
         this.sign = sign;
@@ -61,8 +50,10 @@ public class ShopSign
         itemrender.setRenderManager(RenderManager.instance);
         this.username = sign.signText[0];
         this.item = GetStackFromName(sign.signText[3], Integer.parseInt(sign.signText[1]));
-        this.buyPrice = 0;
-        this.sellPrice = 0;
+        for (int i = 0; i < 2 ;i++)
+        	Price[i] = GetPrice(sign.signText[2], i);
+        	
+        
     }
 
     public static ItemStack GetStackFromName(String name)
@@ -72,66 +63,15 @@ public class ShopSign
 
     public static ItemStack GetStackFromName(String name, int amount)
     {
-        if (NameList.containsKey(name))
-        {
-            if (NameList.get(name) == null)
-            {
-                return null;
-            }
-
-            return new ItemStack(NameList.get(name), 1);
-        }
-        else
-        {
-        	try{
-	        	if (name.contains(":")){
-	        		int id = Integer.parseInt(name.replace("X", "").split(":")[0]);
-	        		int subid = Integer.parseInt(name.replace("X", "").split(":")[1]);
-	        		return new ItemStack(id, amount, 0);
-	        	}
-        	}
-        	catch(Exception e){}
-            
-        	
-        	/*if (name.contains("X"))
-            {
-            	if (name.contains(":")){
-            		int id = Integer.parseInt(name.replace("X", "").split(":")[0]);
-            		int subid = Integer.parseInt(name.replace("X", "").split(":")[1]);
-            		return new ItemStack(id, amount, 0);
-            	}else{
-            		int id = Integer.parseInt(name.replace("X", ""));
-            		return new ItemStack(id, amount, 0);
-            	}
-                
-                
-            }
-            else
-                for (Item item : Item.itemsList)
-                {
-                    if (item != null)
-                    {
-                        try
-                        {
-                            ItemStack itemstack = new ItemStack(item, amount);
-                            String displayname = itemstack.getDisplayName();
-
-                            //String displayname = item.getu
-                            if (displayname != null && displayname.equalsIgnoreCase(name))
-                            {
-                                NameList.put(name, item);
-                                return itemstack;
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
-                    }
-                }*/
-        }
-
-        NameList.put(name, null);
+		try{
+	    	if (name.contains(":")){
+	    		int id = Integer.parseInt(name.replace("X", "").split(":")[0]);
+	    		int subid = Integer.parseInt(name.replace("X", "").split(":")[1]);
+	    		return new ItemStack(id, amount, subid);
+	    	}
+		}
+		catch(Exception e){}
+		
         return null;
     }
 
@@ -139,7 +79,7 @@ public class ShopSign
     {
         //Credits to neptunepink creator of factorization, this code is used in the barrel of his mod.
         GL11.glPushMatrix();
-        GL11.glTranslatef(-40F, -10F, 0F);
+        GL11.glTranslatef(-45F, -10F, 0F);
         GL11.glScalef(1.5F, 1.5F, 0.01F);
         itemrender.renderItemAndEffectIntoGUI(mc.fontRenderer, mc.renderEngine, is, 0, 0);
         GL11.glPopMatrix();
@@ -149,13 +89,28 @@ public class ShopSign
     {
         handleRenderItem(item);
         mc.fontRenderer.drawString(this.username, -mc.fontRenderer.getStringWidth(this.username) / 2, -20, 0x0000000);
-        mc.fontRenderer.drawString(this.buyPrice + "", -10, 0, 0x0000000);
-        mc.fontRenderer.drawString(this.sellPrice + "", -10, -10, 0x0000000);
+        
+        int i = 0;
+        for (String Printprice : Price){
+        	if (Printprice != null){
+        		mc.fontRenderer.drawString(Printprice + "", -20, -10 +10*i, 0x0000000);
+        		i++;
+        	}
+        }
+        	
+        
         mc.fontRenderer.drawString(this.item.stackSize + "", -20, 8, 0x111111);
     }
 
-    private double GetPrice(String text, char indicator)
+    private String GetPrice(String text, int i)
     {
+    	char indicator;
+    	if (i == 0)
+    		indicator = BUY_INDICATOR;
+    	else
+    		indicator = SELL_INDICATOR;
+    		
+    	 admintools.notifications.ShowNotification(indicator + " ");
         String[] split = text.replace(" ", "").toLowerCase().split(":");
         String character = String.valueOf(indicator).toLowerCase();
 
@@ -170,7 +125,10 @@ public class ShopSign
 
             if (part.equals(FREE_TEXT))
             {
-                return FREE;
+            	if (i == 0)
+            		return "Buy: Free";
+            	else
+            		return "Sell: Free";
             }
 
             if (isDouble(part))
@@ -179,16 +137,18 @@ public class ShopSign
 
                 if (price <= 0)
                 {
-                    return NO_PRICE;
+                    return null;
                 }
                 else
                 {
-                    return price;
+                	if (i == 0)
+                		return "Buy: " + price;
+                	else
+                		return "Sell: " + price;
                 }
             }
         }
-
-        return NO_PRICE;
+        return null;
     }
 
     private boolean isDouble(String string)
@@ -207,16 +167,6 @@ public class ShopSign
     public String getUsername()
     {
         return username;
-    }
-
-    public int getBuyPrice()
-    {
-        return buyPrice;
-    }
-
-    public int getSellPrice()
-    {
-        return sellPrice;
     }
 
     public ItemStack getItem()

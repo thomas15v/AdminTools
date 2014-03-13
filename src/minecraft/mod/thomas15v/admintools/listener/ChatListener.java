@@ -23,7 +23,7 @@ public class ChatListener implements IChatListener
     @Override
     public Packet3Chat clientChat(NetHandler handler, Packet3Chat message)
     {
-        notifications.ShowNotification(message.message);
+        //notifications.ShowNotification(message.message);
         return message;
     }
 }
